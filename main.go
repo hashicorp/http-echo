@@ -44,7 +44,7 @@ func main() {
 	// Extra args get printed to the HTML page
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, *textFlag)
+		fmt.Fprintln(w, *textFlag)
 	})
 
 	server, err := NewServer(*listenFlag, mux)
