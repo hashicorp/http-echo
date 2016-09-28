@@ -10,8 +10,14 @@ docker:
 	@echo "==> Building container..."
 	@docker build \
 		-f="docker/build.Dockerfile" \
+		-t="hashicorp/http-echo" \
 		-t="hashicorp/http-echo:${VERSION}" \
 		$(shell pwd)
+
+docker-push:
+	@echo "Pushing to docker hub..."
+	@docker push "hashicorp/http-echo"
+	@docker push "hashicorp/http-echo:${VERSION}"
 
 # dev creates binares for testing locally - they are put into ./bin and $GOPATH.
 dev:

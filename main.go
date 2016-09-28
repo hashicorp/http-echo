@@ -20,7 +20,7 @@ const (
 )
 
 var (
-	listenFlag  = flag.String("listen", ":8080", "address and port to listen")
+	listenFlag  = flag.String("listen", ":5678", "address and port to listen")
 	versionFlag = flag.Bool("version", false, "display version information")
 )
 
