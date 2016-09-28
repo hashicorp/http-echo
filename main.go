@@ -10,10 +10,6 @@ import (
 	"syscall"
 )
 
-const (
-	version = "0.1.0"
-)
-
 var (
 	listenFlag  = flag.String("listen", ":5678", "address and port to listen")
 	textFlag    = flag.String("text", "", "text to put on the webpage")
