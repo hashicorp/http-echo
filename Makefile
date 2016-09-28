@@ -16,7 +16,7 @@ docker:
 
 docker-push:
 	@echo "Pushing to docker hub..."
-	@docker push "hashicorp/http-echo"
+	@docker push "hashicorp/http-echo:latest"
 	@docker push "hashicorp/http-echo:${VERSION}"
 
 # dev creates binares for testing locally - they are put into ./bin and $GOPATH.
