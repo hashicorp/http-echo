@@ -7,7 +7,7 @@ import (
 
 var (
 	Name      string = "http-eacho"
-	Version   string = "0.1.1"
+	Version   string = "0.1.2"
 	GitCommit string
 )
 
