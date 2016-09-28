@@ -33,14 +33,17 @@ mkdir -p bin/
 # Build
 echo "==> Building..."
 export CGO_ENABLED=0
-for GOARCH in $XC_ARCH; do
-  for GOOS in $XC_OS; do
+for GOOS in $XC_OS; do
+  for GOARCH in $XC_ARCH; do
     if [[ $XC_EXCLUDE == *"${GOOS}/${GOARCH}"* ]]; then
       continue
     fi
 
     printf "%s%20s %s\n" "-->" "${GOOS}/${GOARCH}:" "${PKGNAME}"
-    go build \
+    env \
+      GOOS="${GOOS}" \
+      GOARCH="${GOARCH}" \
+      go build \
       -a \
       -ldflags="-X main.GitCommit=${GIT_COMMIT}${GIT_DIRTY}" \
       -o="pkg/${GOOS}_${GOARCH}/${NAME}" \
