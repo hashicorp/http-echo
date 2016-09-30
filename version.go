@@ -1,23 +1,11 @@
 package main
 
-import (
-	"bytes"
-	"fmt"
-)
+import "fmt"
 
 var (
-	Name      string = "http-eacho"
+	Name      string = "http-echo"
 	Version   string = "0.1.2"
 	GitCommit string
+
+	humanVersion = fmt.Sprintf("%s v%s (%s)", Name, Version, GitCommit)
 )
-
-func formattedVersion() string {
-	var versionString bytes.Buffer
-	fmt.Fprintf(&versionString, "%s v%s", Name, Version)
-
-	if GitCommit != "" {
-		fmt.Fprintf(&versionString, " (%s)", GitCommit)
-	}
-
-	return versionString.String()
-}

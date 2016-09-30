@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net"
 	"net/http"
 	"sync"
@@ -21,8 +20,6 @@ func NewServer(addr string, handler http.Handler) (*StoppableServer, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	handler = loggingMux(handler)
 
 	var stoppableServer StoppableServer
 	stoppableServer.server = &http.Server{Handler: handler}
@@ -68,11 +65,4 @@ func (s *StoppableServer) Stop() {
 
 func (s *StoppableServer) Wait() {
 	s.wg.Wait()
-}
-
-func loggingMux(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("[%s] %s\n", r.Method, r.URL)
-		h.ServeHTTP(w, r)
-	})
 }

@@ -14,6 +14,10 @@ var (
 	listenFlag  = flag.String("listen", ":5678", "address and port to listen")
 	textFlag    = flag.String("text", "", "text to put on the webpage")
 	versionFlag = flag.Bool("version", false, "display version information")
+
+	// stdoutW and stderrW are for overriding in test.
+	stdoutW = os.Stdout
+	stderrW = os.Stderr
 )
 
 func main() {
@@ -21,27 +25,28 @@ func main() {
 
 	// Asking for the version?
 	if *versionFlag {
-		printError(formattedVersion())
+		fmt.Fprintln(stderrW, humanVersion)
 		os.Exit(0)
 	}
 
 	// Validation
 	if *textFlag == "" {
-		printError("Missing -text option!")
+		fmt.Fprintln(stderrW, "Missing -text option!")
 		os.Exit(127)
 	}
 
 	args := flag.Args()
 	if len(args) > 0 {
-		printError("Extra arguments!")
+		fmt.Fprintln(stderrW, "Too many arguments!")
 		os.Exit(127)
 	}
 
-	// Extra args get printed to the HTML page
+	// Flag gets printed as a page
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, *textFlag)
-	})
+	mux.HandleFunc("/", httpLog(stdoutW, withAppHeaders(httpEcho(*textFlag))))
+
+	// Health endpoint
+	mux.HandleFunc("/health", withAppHeaders(httpHealth()))
 
 	server, err := NewServer(*listenFlag, mux)
 	if err != nil {
@@ -70,6 +75,14 @@ func main() {
 	}
 }
 
-func printError(s string) {
-	fmt.Fprintf(os.Stderr, "%s\n", s)
+func httpEcho(v string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, v)
+	}
+}
+
+func httpHealth() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{"status":"ok"}`)
+	}
 }
