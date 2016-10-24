@@ -31,6 +31,7 @@ bin:
 		--rm \
 		--env="VERSION=${VERSION}" \
 		--env="PROJECT=${PROJECT}" \
+		--env="OWNER=${OWNER}" \
 		--env="NAME=${NAME}" \
 		--env="XC_OS=${XC_OS}" \
 		--env="XC_ARCH=${XC_ARCH}" \
