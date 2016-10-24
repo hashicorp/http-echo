@@ -4,7 +4,7 @@ CURRENT_DIR := $(dir $(realpath $(MKFILE_PATH)))
 CURRENT_DIR := $(CURRENT_DIR:/=)
 
 # Get the project metadata
-VERSION := 0.1.1
+VERSION := 0.2.0
 PROJECT := $(shell echo $(CURRENT_DIR) | rev | cut -d'/' -f1 -f2 -f3 | rev)
 NAME := $(notdir $(PROJECT))
 
