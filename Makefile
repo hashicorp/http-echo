@@ -6,6 +6,8 @@ CURRENT_DIR := $(CURRENT_DIR:/=)
 # Get the project metadata
 VERSION := 0.2.0
 PROJECT := $(shell echo $(CURRENT_DIR) | rev | cut -d'/' -f1 -f2 -f3 | rev)
+OWNER := $(dir $(PROJECT))
+OWNER := $(notdir $(OWNER:/=))
 NAME := $(notdir $(PROJECT))
 
 # Current system information (this is the invoking system)
@@ -37,7 +39,7 @@ bin:
 		--volume="${CURRENT_DIR}:/go/src/${PROJECT}" \
 		golang:1.7 /bin/sh -c "scripts/compile.sh"
 
-# deps
+# deps gets all the dependencies for this repository and vendors them.
 deps:
 	@echo "==> Updating dependencies..."
 	@echo "--> Installing dependency manager..."
@@ -80,14 +82,14 @@ docker:
 		--pull \
 		--rm \
 		--file="docker/Dockerfile" \
-		--tag="hashicorp/${NAME}" \
-		--tag="hashicorp/${NAME}:${VERSION}" \
+		--tag="${OWNER}/${NAME}" \
+		--tag="${OWNER}/${NAME}:${VERSION}" \
 		"${CURRENT_DIR}"
 
 # docker-push pushes the container to the registry
 docker-push:
 	@echo "==> Pushing to Docker registry..."
-	@docker push "hashicorp/${NAME}:latest"
-	@docker push "hashicorp/${NAME}:${VERSION}"
+	@docker push "${OWNER}/${NAME}:latest"
+	@docker push "${OWNER}/${NAME}:${VERSION}"
 
 .PHONY: bin deps dev dist docker docker-push
