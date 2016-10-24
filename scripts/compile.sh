@@ -12,7 +12,7 @@ if [ -z "$PROJECT" ]; then
 fi
 
 # Get the git commit information
-GIT_COMMIT="$(git rev-parse HEAD)"
+GIT_COMMIT="$(git rev-parse --short HEAD)"
 GIT_DIRTY="$(test -n "$(git status --porcelain)" && echo "+CHANGES" || true)"
 
 # Remove old builds
