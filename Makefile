@@ -4,11 +4,13 @@ CURRENT_DIR := $(dir $(realpath $(MKFILE_PATH)))
 CURRENT_DIR := $(CURRENT_DIR:/=)
 
 # Get the project metadata
+GOVERSION := 1.7.3
 VERSION := 0.2.1
 PROJECT := $(shell echo $(CURRENT_DIR) | rev | cut -d'/' -f1 -f2 -f3 | rev)
 OWNER := $(dir $(PROJECT))
 OWNER := $(notdir $(OWNER:/=))
 NAME := $(notdir $(PROJECT))
+EXTERNAL_TOOLS =
 
 # Current system information (this is the invoking system)
 ME_OS = $(shell go env GOOS)
@@ -21,6 +23,12 @@ XC_EXCLUDE ?=
 
 # GPG Signing key (blank by default, means no GPG signing)
 GPG_KEY ?=
+
+# List of tests to run
+TEST = ./...
+
+# List all our actual files, excluding vendor
+GOFILES = $(shell go list $(TEST) | grep -v /vendor/)
 
 # bin builds the project by invoking the compile script inside of a Docker
 # container. Invokers can override the target OS or architecture using
@@ -36,9 +44,18 @@ bin:
 		--env="XC_OS=${XC_OS}" \
 		--env="XC_ARCH=${XC_ARCH}" \
 		--env="XC_EXCLUDE=${XC_EXCLUDE}" \
+		--env="DIST=${DIST}" \
 		--workdir="/go/src/${PROJECT}" \
 		--volume="${CURRENT_DIR}:/go/src/${PROJECT}" \
-		golang:1.7 /bin/sh -c "scripts/compile.sh"
+		"golang:${GOVERSION}" /bin/sh -c "scripts/compile.sh"
+
+# bootstrap installs the necessary go tools for development or build
+bootstrap:
+	@echo "==> Bootstrapping ${PROJECT}..."
+	@for t in ${EXTERNAL_TOOLS}; do \
+		echo "--> Installing "$$t"..." ; \
+		go get -u "$$t"; \
+	done
 
 # deps gets all the dependencies for this repository and vendors them.
 deps:
@@ -60,7 +77,8 @@ dev:
 	@cp "${CURRENT_DIR}/pkg/${ME_OS}_${ME_ARCH}/${NAME}" "${GOPATH}/bin/"
 
 # dist builds the binaries and then signs and packages them for distribution
-dist: bin
+dist:
+	@${MAKE} -f "${MKFILE_PATH}" bin DIST=1
 	@echo "==> Tagging release (v${VERSION})..."
 ifdef GPG_KEY
 	@git commit --allow-empty --gpg-sign="${GPG_KEY}" -m "Release v${VERSION}"
@@ -93,4 +111,14 @@ docker-push:
 	@docker push "${OWNER}/${NAME}:latest"
 	@docker push "${OWNER}/${NAME}:${VERSION}"
 
-.PHONY: bin deps dev dist docker docker-push
+# test runs the test suite
+test:
+	@echo "==> Testing ${PROJECT}..."
+	@go test -timeout=60s -parallel=10 ${GOFILES} ${TESTARGS}
+
+# test-race runs the race checker
+test-race:
+	@echo "==> Testing ${PROJECT} (race)..."
+	@go test -timeout=60s -race ${GOFILES} ${TESTARGS}
+
+.PHONY: bin bootstrap deps dev dist docker docker-push test test-race

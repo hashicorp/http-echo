@@ -28,7 +28,9 @@ LDFLAGS="$LDFLAGS -X main.GitCommit=${GIT_COMMIT}${GIT_DIRTY}"
 # Build!
 for GOOS in $XC_OS; do
   for GOARCH in $XC_ARCH; do
-    if [ "$XC_EXCLUDE" = "*${GOOS}/${GOARCH}*" ]; then
+    COMBO="${GOOS}/${GOARCH}"
+    if test "${XC_EXCLUDE#*$COMBO}" != "${XC_EXCLUDE}"; then
+      printf "%s%20s %s\n" "-->" "${GOOS}/${GOARCH}:" "${PROJECT} (excluded)"
       continue
     fi
 
@@ -48,7 +50,16 @@ for GOOS in $XC_OS; do
   done
 done
 
+# If we are not in distribution mode, exit now
+if [ -z "$DIST" ]; then
+  exit 0
+fi
+
 echo "--> Compressing..."
+
+apt-get update -qq >/dev/null 2>&1
+apt-get install -yqq --force-yes unzip zip >/dev/null 2>&1
+
 mkdir pkg/dist
 for PLATFORM in $(find ./pkg -mindepth 1 -maxdepth 1 -type d); do
   OSARCH=$(basename ${PLATFORM})
@@ -57,7 +68,8 @@ for PLATFORM in $(find ./pkg -mindepth 1 -maxdepth 1 -type d); do
   fi
 
   cd $PLATFORM
-  tar -czf ../dist/${NAME}_${VERSION}_${OSARCH}.tgz ${NAME}
+  tar -czf ../dist/${NAME}_${VERSION}_${OSARCH}.tar.gz ${NAME}
+  zip ../dist/${NAME}_${VERSION}_${OSARCH}.zip ${NAME}
   cd - >/dev/null 2>&1
 done
 
