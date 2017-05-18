@@ -4,8 +4,8 @@ CURRENT_DIR := $(dir $(realpath $(MKFILE_PATH)))
 CURRENT_DIR := $(CURRENT_DIR:/=)
 
 # Get the project metadata
-GOVERSION := 1.7.3
-VERSION := 0.2.1
+GOVERSION := 1.8.1
+VERSION := 0.2.2
 PROJECT := $(shell echo $(CURRENT_DIR) | rev | cut -d'/' -f1 -f2 -f3 | rev)
 OWNER := $(dir $(PROJECT))
 OWNER := $(notdir $(OWNER:/=))
@@ -72,9 +72,14 @@ dev:
 		XC_OS="${ME_OS}" \
 		XC_ARCH="${ME_ARCH}" \
 		$(MAKE) -f "${MKFILE_PATH}" bin
-	@echo "--> Moving into PATH"
+	@echo "--> Moving into bin/"
+	@mkdir -p "${CURRENT_DIR}/bin/"
 	@cp "${CURRENT_DIR}/pkg/${ME_OS}_${ME_ARCH}/${NAME}" "${CURRENT_DIR}/bin/"
+ifdef GOPATH
+	@echo "--> Moving into GOPATH/"
+	@mkdir -p "${GOPATH}/bin/"
 	@cp "${CURRENT_DIR}/pkg/${ME_OS}_${ME_ARCH}/${NAME}" "${GOPATH}/bin/"
+endif
 
 # dist builds the binaries and then signs and packages them for distribution
 dist:

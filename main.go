@@ -57,7 +57,7 @@ func main() {
 	go server.Start()
 	log.Printf("Server is listening on %s\n", *listenFlag)
 
-	signalCh := make(chan os.Signal, syscall.SIGINT)
+	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh)
 
 	for {
