@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"syscall"
+	"time"
+
+	"github.com/hashicorp/http-echo/version"
 )
 
 var (
@@ -25,7 +28,7 @@ func main() {
 
 	// Asking for the version?
 	if *versionFlag {
-		fmt.Fprintln(stderrW, humanVersion)
+		fmt.Fprintln(stderrW, version.HumanVersion)
 		os.Exit(0)
 	}
 
@@ -48,31 +51,35 @@ func main() {
 	// Health endpoint
 	mux.HandleFunc("/health", withAppHeaders(httpHealth()))
 
-	server, err := NewServer(*listenFlag, mux)
-	if err != nil {
-		log.Printf("[ERR] Error starting server: %s", err)
-		os.Exit(127)
+	server := &http.Server{
+		Addr:    *listenFlag,
+		Handler: mux,
 	}
-
-	go server.Start()
-	log.Printf("Server is listening on %s\n", *listenFlag)
+	serverCh := make(chan struct{})
+	go func() {
+		log.Printf("[INFO] server is listening on %s\n", *listenFlag)
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("[ERR] server exited with: %s", err)
+		}
+		close(serverCh)
+	}()
 
 	signalCh := make(chan os.Signal, 1)
-	signal.Notify(signalCh)
+	signal.Notify(signalCh, os.Interrupt)
 
-	for {
-		select {
-		case s := <-signalCh:
-			switch s {
-			case syscall.SIGINT:
-				log.Printf("[INFO] Received interrupt")
-				server.Stop()
-				os.Exit(2)
-			default:
-				log.Printf("[ERR] Unknown signal %v", s)
-			}
-		}
+	// Wait for interrupt
+	<-signalCh
+
+	log.Printf("[INFO] received interrupt, shutting down...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("[ERR] failed to shutdown server: %s", err)
 	}
+
+	// If we got this far, it was an interrupt, so don't exit cleanly
+	os.Exit(2)
 }
 
 func httpEcho(v string) http.HandlerFunc {
