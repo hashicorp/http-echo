@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	listenFlag  = flag.String("listen", ":5679", "address and port to listen")
+	listenFlag  = flag.String("listen", ":5678", "address and port to listen")
 	textFlag    = flag.String("text", "", "text to put on the webpage")
 	versionFlag = flag.Bool("version", false, "display version information")
 
