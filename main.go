@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	listenFlag  = flag.String("listen", ":5678", "address and port to listen")
+	listenFlag  = flag.String("listen", ":5679", "address and port to listen")
 	textFlag    = flag.String("text", "", "text to put on the webpage")
 	versionFlag = flag.Bool("version", false, "display version information")
 
@@ -34,8 +34,12 @@ func main() {
 
 	// Validation
 	if *textFlag == "" {
-		fmt.Fprintln(stderrW, "Missing -text option!")
-		os.Exit(127)
+		envTextVar := os.Getenv("ECHO_TEXT")
+		textFlag = &envTextVar
+		if *textFlag == "" {
+			fmt.Fprintln(stderrW, "Missing -text option OR ENV var TEXT is empty!")
+			os.Exit(127)
+		}
 	}
 
 	args := flag.Args()
