@@ -15,7 +15,7 @@ GOTAGS ?=
 GOMAXPROCS ?= 4
 
 # Get the project metadata
-GOVERSION := 1.9.2
+GOVERSION := 1.17
 PROJECT := $(CURRENT_DIR:$(GOPATH)/src/%=%)
 OWNER := $(notdir $(patsubst %/,%,$(dir $(PROJECT))))
 NAME := $(notdir $(PROJECT))
@@ -44,7 +44,7 @@ LD_FLAGS ?= \
 	-X ${PROJECT}/version.GitCommit=${GIT_COMMIT}
 
 # List of Docker targets to build
-DOCKER_TARGETS ?= scratch
+DOCKER_TARGETS ?= scratch alpine
 
 # List of tests to run
 TEST ?= ./...
@@ -138,7 +138,6 @@ define make-docker-target
 			--rm \
 			--force-rm \
 			--no-cache \
-			--squash \
 			--compress \
 			--file="docker/${1}/Dockerfile" \
 			--build-arg="LD_FLAGS=${LD_FLAGS}" \
