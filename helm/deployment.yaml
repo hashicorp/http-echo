@@ -19,7 +19,6 @@ spec:
         - name: echo-service
           image: hashicorp/http-echo
           args:
-            - "-listen=6789"
             - "-text=banana2"
 ---
 apiVersion: v1
@@ -28,10 +27,8 @@ metadata:
   name: echo-service
   namespace: oyvindis
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
-    - name: "6789"
-      port: 6789
-      targetPort: 6789
+    - port: 5678 # Default port for image
   selector:
     app: echo
