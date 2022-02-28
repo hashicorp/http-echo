@@ -30,4 +30,3 @@ spec:
     app: echo-service
   ports:
     - port: 5678
-      targetPort: 5678
