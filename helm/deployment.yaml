@@ -6,7 +6,6 @@ metadata:
   labels:
     app: echo-service
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: echo-service
@@ -19,7 +18,7 @@ spec:
         - name: echo-service
           image: hashicorp/http-echo
           args:
-            - "-text=banana2"
+            - "-text=Hello-world"
 ---
 apiVersion: v1
 kind: Service
@@ -27,8 +26,8 @@ metadata:
   name: echo-service
   namespace: oyvindis
 spec:
-  type: ClusterIP
-  ports:
-    - port: 5678 # Default port for image
   selector:
-    app: echo
+    app: echo-service
+  ports:
+    - port: 5678
+      targetPort: 5678
