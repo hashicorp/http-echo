@@ -27,7 +27,6 @@ jobs:
       - name: Deploy to Kubernetes cluster
         uses: Azure/k8s-deploy@v1.4
         with:
-          namespace: 'oyvindis'
           manifests: ./helm/deployment.yaml
           images: 'hashicorp/http-echo'
           kubectl-version: 'latest'
