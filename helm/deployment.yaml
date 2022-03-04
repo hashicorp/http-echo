@@ -17,7 +17,7 @@ spec:
         - name: echo-service
           image: hashicorp/http-echo
           args:
-            - "-text=Hello-world"
+            - "-text=Hello-world-1"
 ---
 apiVersion: v1
 kind: Service
