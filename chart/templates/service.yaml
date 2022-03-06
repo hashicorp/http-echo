@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo-service
+  namespace: {{ required "Missing value NAMESPACE" .Values.NAMESPACE }}
+spec:
+  selector:
+    app: echo-service
+  ports:
+    - port: 5678
