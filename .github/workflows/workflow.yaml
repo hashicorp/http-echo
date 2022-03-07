@@ -1,8 +1,10 @@
-name: Deploy to staging
+name: CI
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
-    types: [ready_for_review, opened, reopened, synchronize]
     branches:
       - master
 
