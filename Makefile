@@ -30,7 +30,7 @@ GOARCH ?= $(shell go env GOARCH)
 
 # Default os-arch combination to build
 XC_OS ?= darwin linux windows
-XC_ARCH ?= amd64
+XC_ARCH ?= amd64 arm64
 XC_EXCLUDE ?=
 
 # GPG Signing key (blank by default, means no GPG signing)
