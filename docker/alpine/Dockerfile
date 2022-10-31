@@ -8,8 +8,5 @@ RUN apk add curl
 RUN addgroup http-echo
 RUN adduser -S -G http-echo 100
 
-COPY pkg/bin/linux_${TARGETARCH}/${BIN_NAME} /bin
-COPY cni/pkg/bin/linux_${TARGETARCH}/${CNI_BIN_NAME} /bin
-
 USER 100
 ENTRYPOINT ["/http-echo"]
