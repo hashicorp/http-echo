@@ -15,14 +15,12 @@ GOTAGS ?=
 GOMAXPROCS ?= 4
 
 # Get the project metadata
-GOVERSION := 1.17
+GOVERSION := 1.19
 PROJECT := $(CURRENT_DIR:$(GOPATH)/src/%=%)
-OWNER := $(notdir $(patsubst %/,%,$(dir $(PROJECT))))
-NAME := $(notdir $(PROJECT))
+OWNER ?= hashicorp
+NAME ?= http-echo
 GIT_COMMIT ?= $(shell git rev-parse --short HEAD)
 VERSION := $(shell awk -F\" '/Version/ { print $$2; exit }' "${CURRENT_DIR}/version/version.go")
-EXTERNAL_TOOLS = \
-	github.com/golang/dep/cmd/dep
 
 # Current system information
 GOOS ?= $(shell go env GOOS)
@@ -85,22 +83,6 @@ define make-xc-target
 endef
 $(foreach goarch,$(XC_ARCH),$(foreach goos,$(XC_OS),$(eval $(call make-xc-target,$(goos),$(goarch),$(if $(findstring windows,$(goos)),.exe,)))))
 
-# bootstrap installs the necessary go tools for development or build.
-bootstrap:
-	@echo "==> Bootstrapping ${PROJECT}"
-	@for t in ${EXTERNAL_TOOLS}; do \
-		echo "--> Installing $$t" ; \
-		go get -u "$$t"; \
-	done
-.PHONY: bootstrap
-
-# deps updates all dependencies for this project.
-deps:
-	@echo "==> Updating deps for ${PROJECT}"
-	@dep ensure -update
-	@dep prune
-.PHONY: deps
-
 # dev builds and installs the project locally.
 dev:
 	@echo "==> Installing ${NAME} for ${GOOS}/${GOARCH}"
@@ -134,18 +116,20 @@ endif
 define make-docker-target
   docker-build/$1:
 		@echo "==> Building ${1} Docker container for ${PROJECT}"
-		@docker build \
+		@docker buildx create --use && docker buildx build \
 			--rm \
 			--force-rm \
 			--no-cache \
 			--compress \
 			--file="docker/${1}/Dockerfile" \
+			--platform linux/amd64,linux/arm64 \
 			--build-arg="LD_FLAGS=${LD_FLAGS}" \
 			--build-arg="GOTAGS=${GOTAGS}" \
 			$(if $(filter $1,scratch),--tag="${OWNER}/${NAME}",) \
 			--tag="${OWNER}/${NAME}:${1}" \
 			--tag="${OWNER}/${NAME}:${VERSION}-${1}" \
-			"${CURRENT_DIR}"
+			"${CURRENT_DIR}" \
+			--push
   .PHONY: docker-build/$1
 
   docker-build:: docker-build/$1
