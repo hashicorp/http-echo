@@ -210,7 +210,7 @@ _sign:
 		--local-user "${GPG_KEY}" \
 		--message "Version ${VERSION}" \
 		--sign \
-		"v${VERSION}" master
+		"v${VERSION}" main
 	@echo "--> Do not forget to run:"
 	@echo ""
 	@echo "    git push && git push --tags"
