@@ -38,8 +38,8 @@ GPG_KEY ?=
 LD_FLAGS ?= \
 	-s \
 	-w \
-	-X ${PROJECT}/version.Name=${NAME} \
-	-X ${PROJECT}/version.GitCommit=${GIT_COMMIT}
+	-X 'github.com/hashicorp/http-echo/version.Name=${NAME}' \
+	-X 'github.com/hashicorp/http-echo/version.GitCommit=${GIT_COMMIT}'
 
 # List of Docker targets to build
 DOCKER_TARGETS ?= scratch alpine
