@@ -10,7 +10,7 @@ RUN apk add curl
 
 # Create a non-root user to run the software.
 RUN addgroup http-echo
-RUN adduser -S -G http-echo 100
+RUN adduser -S -G http-echo 1005
 
-USER 100
+USER 1005
 ENTRYPOINT ["/http-echo"]
