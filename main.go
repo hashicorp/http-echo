@@ -33,9 +33,15 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Get text to echo from env var or flag
+	echoText := os.Getenv("ECHO_TEXT")
+	if *textFlag != "" {
+		echoText = *textFlag
+	}
+
 	// Validation
-	if *textFlag == "" {
-		fmt.Fprintln(stderrW, "Missing -text option!")
+	if echoText == "" {
+		fmt.Fprintln(stderrW, "Missing -text option or ECHO_TEXT env var!")
 		os.Exit(127)
 	}
 
@@ -47,7 +53,7 @@ func main() {
 
 	// Flag gets printed as a page
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", httpLog(stdoutW, withAppHeaders(httpEcho(*textFlag))))
+	mux.HandleFunc("/", httpLog(stdoutW, withAppHeaders(httpEcho(echoText))))
 
 	// Health endpoint
 	mux.HandleFunc("/health", withAppHeaders(httpHealth()))
