@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	listenFlag  = flag.String("listen", ":5678", "address and port to listen")
-	textFlag    = flag.String("text", "", "text to put on the webpage")
+	listenFlag = flag.String("listen", ":5678", "address and port to listen")
+	textFlag   = flag.String("text", "hello world!, put your message here",
+		"text to put on the webpage")
 	versionFlag = flag.Bool("version", false, "display version information")
 	statusFlag  = flag.Int("status-code", 200, "http response code, e.g.: 200")
 
@@ -38,12 +39,6 @@ func main() {
 	echoText := os.Getenv("ECHO_TEXT")
 	if *textFlag != "" {
 		echoText = *textFlag
-	}
-
-	// Validation
-	if echoText == "" {
-		fmt.Fprintln(stderrW, "Missing -text option or ECHO_TEXT env var!")
-		os.Exit(127)
 	}
 
 	args := flag.Args()
