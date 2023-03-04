@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 FROM alpine:3.17.1
 
 # TARGETOS and TARGETARCH are set automatically when --platform is provided.

@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 FROM ubuntu:latest
 RUN useradd -u 1005 scratchuser
 
