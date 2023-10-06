@@ -4,6 +4,7 @@ CURRENT_DIR := $(patsubst %/,%,$(dir $(realpath $(MKFILE_PATH))))
 
 # Ensure GOPATH
 GOPATH ?= $(HOME)/go
+GOBIN ?= $(GOPATH)/bin
 
 # List all our actual files, excluding vendor
 GOFILES ?= $(shell go list $(TEST) | grep -v /vendor/)
@@ -15,137 +16,87 @@ GOTAGS ?=
 GOMAXPROCS ?= 4
 
 # Get the project metadata
-GOVERSION := 1.19
+GOVERSION := $(shell go version | awk '{print $3}' | sed -e 's/^go//')
 PROJECT := $(CURRENT_DIR:$(GOPATH)/src/%=%)
 OWNER ?= hashicorp
 NAME ?= http-echo
-GIT_COMMIT ?= $(shell git rev-parse --short HEAD)
-VERSION := $(shell awk -F\" '/Version/ { print $$2; exit }' "${CURRENT_DIR}/version/version.go")
+REVISION ?= $(shell git rev-parse --short HEAD)
+VERSION := $(shell cat "${CURRENT_DIR}/version/VERSION")
+TIMESTAMP := $(shell date)
 
-# Current system information
-GOOS ?= $(shell go env GOOS)
-GOARCH ?= $(shell go env GOARCH)
+# Get local ARCH; on Intel Mac, 'uname -m' returns x86_64 which we turn into amd64.
+# Not using 'go env GOOS/GOARCH' here so 'make docker' will work without local Go install.
+ARCH     ?= $(shell A=$$(uname -m); [ $$A = x86_64 ] && A=amd64; echo $$A)
+OS       ?= $(shell uname | tr [[:upper:]] [[:lower:]])
+PLATFORM = $(OS)/$(ARCH)
+DIST     = dist/$(PLATFORM)
+BIN      = $(DIST)/$(NAME)
 
 # Default os-arch combination to build
 XC_OS ?= darwin linux windows
 XC_ARCH ?= amd64 arm64
 XC_EXCLUDE ?=
 
-# GPG Signing key (blank by default, means no GPG signing)
-GPG_KEY ?=
-
 # List of ldflags
 LD_FLAGS ?= \
 	-s \
 	-w \
-	-X 'github.com/hashicorp/http-echo/version.Name=${NAME}' \
-	-X 'github.com/hashicorp/http-echo/version.GitCommit=${GIT_COMMIT}'
-
-# List of Docker targets to build
-DOCKER_TARGETS ?= scratch alpine
+	-X 'github.com/hashicorp/http-echo/version.Version=${VERSION}' \
+	-X 'github.com/hashicorp/http-echo/version.GitCommit=${REVISION}' \
+	-X 'github.com/hashicorp/http-echo/version.Timestamp=${TIMESTAMP}'
 
 # List of tests to run
 TEST ?= ./...
 
-# Create a cross-compile target for every os-arch pairing. This will generate
-# a make target for each os/arch like "make linux/amd64" as well as generate a
-# meta target (build) for compiling everything.
-define make-xc-target
-  $1/$2:
-  ifneq (,$(findstring ${1}/${2},$(XC_EXCLUDE)))
-		@printf "%s%20s %s\n" "-->" "${1}/${2}:" "${PROJECT} (excluded)"
-  else
-		@printf "%s%20s %s\n" "-->" "${1}/${2}:" "${PROJECT}"
-		@docker run \
-			--interactive \
-			--rm \
-			--dns="8.8.8.8" \
-			--volume="${CURRENT_DIR}:/go/src/${PROJECT}" \
-			--workdir="/go/src/${PROJECT}" \
-			"golang:${GOVERSION}" \
-			env \
-				CGO_ENABLED="0" \
-				GOOS="${1}" \
-				GOARCH="${2}" \
-				go build \
-				  -a \
-					-o="pkg/${1}_${2}/${NAME}${3}" \
-					-ldflags "${LD_FLAGS}" \
-					-tags "${GOTAGS}"
-  endif
-  .PHONY: $1/$2
+version:
+	@echo $(VERSION)
+.PHONY: version
 
-  $1:: $1/$2
-  .PHONY: $1
 
-  build:: $1/$2
-  .PHONY: build
-endef
-$(foreach goarch,$(XC_ARCH),$(foreach goos,$(XC_OS),$(eval $(call make-xc-target,$(goos),$(goarch),$(if $(findstring windows,$(goos)),.exe,)))))
+dist:
+	mkdir -p $(DIST)
+
+# build is used for the CRT build.yml workflow. 
+# Environment variables are populated by hashicorp/actions-go-build, not the makefile.
+# https://github.com/hashicorp/actions-go-build
+build:
+	CGO_ENABLED=0 go build \
+		-a \
+		-o="${BIN_PATH}" \
+		-ldflags " \
+			-X 'github.com/hashicorp/http-echo/version.Version=${PRODUCT_VERSION}' \
+			-X 'github.com/hashicorp/http-echo/version.GitCommit=${PRODUCT_REVISION}' \
+			-X 'github.com/hashicorp/http-echo/version.Timestamp=${PRODUCT_REVISION_TIME}' \
+		" \
+		-tags "${GOTAGS}" \
+		-trimpath \
+		-buildvcs=false 
+.PHONY: build
+
+bin: dist
+	@echo "==> Building ${BIN}"
+	@GOARCH=$(ARCH) GOOS=$(OS) CGO_ENABLED=0 go build -trimpath -buildvcs=false -ldflags="$(LD_FLAGS)" -o $(BIN)
+.PHONY: bin
 
 # dev builds and installs the project locally.
-dev:
-	@echo "==> Installing ${NAME} for ${GOOS}/${GOARCH}"
-	@rm -f "${GOPATH}/pkg/${GOOS}_${GOARCH}/${PROJECT}/version.a" # ldflags change and go doesn't detect
-	@env \
-		CGO_ENABLED="0" \
-		go install \
-			-ldflags "${LD_FLAGS}" \
-			-tags "${GOTAGS}"
+dev: bin
+	cp $(BIN) $(GOBIN)/$(BIN_NAME)
 .PHONY: dev
 
-# dist builds the binaries and then signs and packages them for distribution
-dist:
-ifndef GPG_KEY
-	@echo "==> ERROR: No GPG key specified! Without a GPG key, this release cannot"
-	@echo "           be signed. Set the environment variable GPG_KEY to the ID of"
-	@echo "           the GPG key to continue."
-	@exit 127
-else
-	@$(MAKE) -f "${MKFILE_PATH}" _cleanup
-	@$(MAKE) -f "${MKFILE_PATH}" -j4 build
-	@$(MAKE) -f "${MKFILE_PATH}" _compress _checksum _sign
-endif
-.PHONY: dist
+# Docker Stuff.
+export DOCKER_BUILDKIT=1
+BUILD_ARGS = BIN_NAME=http-echo PRODUCT_VERSION=$(VERSION)
+TAG        = $(NAME):local
+BA_FLAGS   = $(addprefix --build-arg=,$(BUILD_ARGS))
+FLAGS      = --platform $(PLATFORM) --tag $(TAG) $(BA_FLAGS)
 
-# Create a docker compile and push target for each container. This will create
-# docker-build/scratch, docker-push/scratch, etc. It will also create two meta
-# targets: docker-build and docker-push, which will build and push all
-# configured Docker containers. Each container must have a folder in docker/
-# named after itself with a Dockerfile (docker/alpine/Dockerfile).
-define make-docker-target
-  docker-build/$1:
-		@echo "==> Building ${1} Docker container for ${PROJECT}"
-		@docker buildx create --use && docker buildx build \
-			--rm \
-			--force-rm \
-			--no-cache \
-			--compress \
-			--file="docker/${1}/Dockerfile" \
-			--platform linux/amd64,linux/arm64 \
-			--build-arg="LD_FLAGS=${LD_FLAGS}" \
-			--build-arg="GOTAGS=${GOTAGS}" \
-			$(if $(filter $1,scratch),--tag="${OWNER}/${NAME}",) \
-			--tag="${OWNER}/${NAME}:${1}" \
-			--tag="${OWNER}/${NAME}:${VERSION}-${1}" \
-			"${CURRENT_DIR}" \
-			--push
-  .PHONY: docker-build/$1
+# Set OS to linux for all docker/* targets.
+docker: OS = linux
 
-  docker-build:: docker-build/$1
-  .PHONY: docker-build
-
-  docker-push/$1:
-		@echo "==> Pushing ${1} to Docker registry"
-		$(if $(filter $1,scratch),@docker push "${OWNER}/${NAME}",)
-		@docker push "${OWNER}/${NAME}:${1}"
-		@docker push "${OWNER}/${NAME}:${VERSION}-${1}"
-  .PHONY: docker-push/$1
-
-  docker-push:: docker-push/$1
-  .PHONY: docker-push
-endef
-$(foreach target,$(DOCKER_TARGETS),$(eval $(call make-docker-target,$(target))))
+docker: bin
+	docker build ${FLAGS} .
+	@echo 'Image built; run "docker run --rm ${TAG}" to try it out.'
+.PHONY: docker
 
 # test runs the test suite.
 test:
@@ -159,61 +110,9 @@ test-race:
 	@go test -timeout=60s -race -tags="${GOTAGS}" ${GOFILES} ${TESTARGS}
 .PHONY: test-race
 
-# _cleanup removes any previous binaries
-_cleanup:
+# clean removes any previous binaries
+clean:
 	@rm -rf "${CURRENT_DIR}/pkg/"
 	@rm -rf "${CURRENT_DIR}/bin/"
+.PHONY: clean
 
-# _compress compresses all the binaries in pkg/* as tarball and zip.
-_compress:
-	@mkdir -p "${CURRENT_DIR}/pkg/dist"
-	@for platform in $$(find ./pkg -mindepth 1 -maxdepth 1 -type d); do \
-		osarch=$$(basename "$$platform"); \
-		if [ "$$osarch" = "dist" ]; then \
-			continue; \
-		fi; \
-		\
-		ext=""; \
-		if test -z "$${osarch##*windows*}"; then \
-			ext=".exe"; \
-		fi; \
-		cd "$$platform"; \
-		tar -czf "${CURRENT_DIR}/pkg/dist/${NAME}_${VERSION}_$${osarch}.tgz" "${NAME}$${ext}"; \
-		zip -q "${CURRENT_DIR}/pkg/dist/${NAME}_${VERSION}_$${osarch}.zip" "${NAME}$${ext}"; \
-		cd - &>/dev/null; \
-	done
-.PHONY: _compress
-
-# _checksum produces the checksums for the binaries in pkg/dist
-_checksum:
-	@cd "${CURRENT_DIR}/pkg/dist" && \
-		shasum --algorithm 256 * > ${CURRENT_DIR}/pkg/dist/${NAME}_${VERSION}_SHA256SUMS && \
-		cd - &>/dev/null
-.PHONY: _checksum
-
-# _sign signs the binaries using the given GPG_KEY. This should not be called
-# as a separate function.
-_sign:
-	@echo "==> Signing ${PROJECT} at v${VERSION}"
-	@gpg \
-		--default-key "${GPG_KEY}" \
-		--detach-sig "${CURRENT_DIR}/pkg/dist/${NAME}_${VERSION}_SHA256SUMS"
-	@git commit \
-		--allow-empty \
-		--gpg-sign="${GPG_KEY}" \
-		--message "Release v${VERSION}" \
-		--quiet \
-		--signoff
-	@git tag \
-		--annotate \
-		--create-reflog \
-		--local-user "${GPG_KEY}" \
-		--message "Version ${VERSION}" \
-		--sign \
-		"v${VERSION}" main
-	@echo "--> Do not forget to run:"
-	@echo ""
-	@echo "    git push && git push --tags"
-	@echo ""
-	@echo "And then upload the binaries in dist/!"
-.PHONY: _sign
