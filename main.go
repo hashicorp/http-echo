@@ -33,7 +33,7 @@ func main() {
 
 	// Asking for the version?
 	if *versionFlag {
-		fmt.Fprintln(stderrW, version.HumanVersion)
+		fmt.Fprintln(stdoutW, version.HumanVersion)
 		os.Exit(0)
 	}
 

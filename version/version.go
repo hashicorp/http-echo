@@ -5,11 +5,12 @@ package version
 
 import "fmt"
 
-const Version = "0.2.4"
+const Name = "http-echo"
 
 var (
-	Name      string
 	GitCommit string
+	Version   string
+	Timestamp string
 
-	HumanVersion = fmt.Sprintf("%s v%s (%s)", Name, Version, GitCommit)
+	HumanVersion = fmt.Sprintf("%s v%s (%s)\nBuilt: %s", Name, Version, GitCommit, Timestamp)
 )
