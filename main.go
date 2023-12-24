@@ -66,13 +66,11 @@ func main() {
 		Addr:    *listenFlag,
 		Handler: mux,
 	}
-	serverCh := make(chan struct{})
 	go func() {
 		log.Printf("[INFO] server is listening on %s\n", *listenFlag)
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("[ERR] server exited with: %s", err)
 		}
-		close(serverCh)
 	}()
 
 	signalCh := make(chan os.Signal, 1)
@@ -89,8 +87,7 @@ func main() {
 		log.Fatalf("[ERR] failed to shutdown server: %s", err)
 	}
 
-	// If we got this far, it was an interrupt, so don't exit cleanly
-	os.Exit(2)
+	os.Exit(0)
 }
 
 func httpEcho(v string) http.HandlerFunc {
