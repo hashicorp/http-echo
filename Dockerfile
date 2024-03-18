@@ -1,25 +1,29 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
+# Use a minimal Go base image
+FROM golang:alpine AS builder
 
-FROM gcr.io/distroless/static-debian12:nonroot as default
+# Set the working directory inside the container
+WORKDIR /app
 
-# TARGETOS and TARGETARCH are set automatically when --platform is provided.
-ARG TARGETOS
-ARG TARGETARCH
-ARG PRODUCT_VERSION
-ARG BIN_NAME
+# Copy the source code into the container
+COPY . .
 
-LABEL name="http-echo" \
-      maintainer="HashiCorp Consul Team <consul@hashicorp.com>" \
-      vendor="HashiCorp" \
-      version=$PRODUCT_VERSION \
-      release=$PRODUCT_VERSION \
-      summary="A test webserver that echos a response. You know, for kids." 
+# Build the http-echo server
+RUN go build -o http-echo .
 
-COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /
+# Start a new stage for a lightweight image
+FROM alpine
 
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the built binary from the previous stage
+COPY --from=builder /app/http-echo .
+
+# Expose the port that the server listens on
 EXPOSE 5678/tcp
 
 ENV ECHO_TEXT="hello-world"
 
-ENTRYPOINT ["/http-echo"]
+# Set the default command to run the server
+ENTRYPOINT ["./http-echo"]
+
