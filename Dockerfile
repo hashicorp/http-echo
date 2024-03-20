@@ -22,7 +22,7 @@ COPY --from=builder /app/http-echo .
 # Expose the port that the server listens on
 EXPOSE 5678/tcp
 
-# // Debugging 
+# Issue fixed
 
 ENV ECHO_TEXT="hello-world" 
 
