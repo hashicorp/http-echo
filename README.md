@@ -10,3 +10,21 @@ http-echo -listen=:8080 -text="hello world"
 ```
 
 Then visit http://localhost:8080/ in your browser.
+
+Step by Step Guid For Setting up A CI/CD Pipeline That Deploys <br /> 
+This Application To A Kubernetes Cluster <br /> 
+Using Helm
+==========
+## Desciption
+This documentation covers the steps for deploying this application to a kubernetes cluster using helm chart, before walking down the steps I will go over listing out the DevOps tools used in carrying out this project.
+
+Prequesite
+==========
+
+- Docker Desktop
+- VScode 
+- Jenkins
+- Git
+- Linux VM
+- Kubernetes
+- Helm Chart
