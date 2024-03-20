@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branches:
-        release/dev
+      - "release/dev"
 
 jobs:
   build:
@@ -28,4 +28,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/clockbox:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/http-echo:latest
