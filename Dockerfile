@@ -22,7 +22,9 @@ COPY --from=builder /app/http-echo .
 # Expose the port that the server listens on
 EXPOSE 5678/tcp
 
-ENV ECHO_TEXT="hello-world"
+# // Testing 
+
+ENV ECHO_TEXT="hello-world" 
 
 # Set the default command to run the server
 ENTRYPOINT ["./http-echo"]
