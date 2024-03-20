@@ -5,7 +5,7 @@ pipeline {
     environment {
         // Set environment variables for authentication (replace with your registry credentials)
         DOCKER_REGISTRY_CREDENTIALS = credentials('awodi2525')
-        DOCKER_REGISTRY_URL = 'localhost:9090' // Docker Desktop's local registry URL
+        DOCKER_REGISTRY_URL = '192.168.156.114:9090' // Docker Desktop's local registry URL
     }
     
     stages {
