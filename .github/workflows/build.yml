@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branches:
-      - "release/dev"
+        release/dev
 
 jobs:
   build:
