@@ -21,10 +21,9 @@ This documentation covers the steps for deploying this application to a kubernet
 Prequesite
 ==========
 
-- Docker Desktop
-- VScode 
-- Jenkins
+- AWS-EC2 intance
+- Docker
+- Minikube
 - Git
-- Linux VM
-- Kubernetes
-- Helm Chart
+- Helm
+- Go
