@@ -46,8 +46,8 @@ jobs:
       -
         name: Deploy Helm chart
         run: |
-          # helm upgrade --install http-echo-release ./helm-http-echo 
-          install --dry-run http-echo ./helm-http-echo
+          helm upgrade --install http-echo-release ./helm-http-echo \
+            
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
           # fix
