@@ -44,12 +44,9 @@ jobs:
           kubeconfig: ${{ secrets.KUBECONFIG }}
 
       -
-        name: Deploy 
-      with:
-        exec: helm upgrade APP_NAME ./helm-http-echo --install --wait --atomic --namespace=APP_NAMESPACE --values=./.helm-http-echo
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
-        # run: |
-        #   helm upgrade --install http-echo-release ./helm-http-echo       
-        # env:
-        #   KUBECONFIG: ${{ secrets.KUBECONFIG }}
-          
+        name: Deploy Helm chart
+        run: |
+          helm upgrade --install http-echo-release ./helm-http-echo       
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+          # fix
