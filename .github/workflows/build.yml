@@ -29,4 +29,25 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/clockbox:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/img-http-echo:latest
+
+      -
+        name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      -
+        name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      -
+        name: Deploy Helm chart
+        run: |
+          helm upgrade --install my-release ./helm-http-echo \
+            --set image.repository=awodi2525/img-http-echo \
+            --set image.tag=latest
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
