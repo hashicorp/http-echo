@@ -47,9 +47,6 @@ jobs:
         name: Deploy Helm chart
         run: |
           helm upgrade --install http-echo-release ./helm-http-echo \
-          --set image.repository=awodi2525/img-http-echo \
-          --set image.tag=latest \
-          --kubeconfig=${{ secrets.KUBECONFIG }} \
           --kube-server=https://192.168.49.2:8443
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
