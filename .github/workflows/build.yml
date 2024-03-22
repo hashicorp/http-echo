@@ -46,7 +46,7 @@ jobs:
       -
         name: Deploy Helm chart
         run: |
-          helm upgrade --install http-echo-release ./helm-http-echo 
+          helm upgrade --install http-echo-release ./helm-http-echo --kube-server=https://192.168.49.2:8443
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
           
