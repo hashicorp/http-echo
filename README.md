@@ -76,4 +76,4 @@ Lets run our docker container from our project root directory like as we did for
 docker run -d -p 8080:5678 --name img-http-echo htttp-echo-container
 ```
 
-https://github.com/Awodi-Emmanuel/http-echo/blob/eed3dec30a2cc2e79d1fff131fa7025c52950c12/Dockerfile
+https://github.com/Awodi-Emmanuel/http-echo/blob/22009921b20049993d09b01434bef068aa46447f/Dockerfile
