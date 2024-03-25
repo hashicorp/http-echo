@@ -70,10 +70,14 @@ I am not going to delve into explaining much on building go dockers image follow
 
 ## 4. Step
 
-Lets run our docker container from our project root directory like as we did for our image mount our port to the container entry port like this:
+Lets run our docker container from our project root directory like as we did for our image map localhost port to the container entry port like this:
 
 ```
 docker run -d -p 8080:5678 --name img-http-echo htttp-echo-container
 ```
+Then visit http://localhost:8080/ in your browser.
 
-https://github.com/Awodi-Emmanuel/http-echo/blob/22009921b20049993d09b01434bef068aa46447f/Dockerfile
+## 5. Step
+
+Now it is time to automate our CI/CD Pipeline with GitHub Workflow  
+
