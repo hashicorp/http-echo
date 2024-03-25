@@ -32,10 +32,19 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/img-http-echo:latest
 
       -
-        name: Set up kubectl
-        uses: azure/setup-kubectl@v1
-        with:
-          kubeconfig: ${{ secrets.KUBECONFIG }}
+        name: create kubeconfig 
+        run: | 
+          mkdir ${HOME}/.kube
+          echo ${{ secrets.KUBECONFIG }} | base64 --decode > ${HOME}/.kube/config
+          cat ${HOME}/.kube/config
+      -
+        name: Use Context
+        run: kubectl config use-context octobay-api
+      # -
+      #   name: Set up kubectl
+      #   uses: azure/setup-kubectl@v1
+      #   with:
+      #     kubeconfig: ${{ secrets.KUBECONFIG }}
 
       -
         name: Set up Helm
