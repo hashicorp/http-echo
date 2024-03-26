@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker { image 'golang:1.22.1-alpine3.19' } }
+    agent any
     
     environment {
         registry = "awodi2525/img-http-echo"
