@@ -1,37 +1,43 @@
 pipeline {
+
     agent any
-    
-    environment {
-        // Set environment variables for authentication (replace with your registry credentials)
-        DOCKER_REGISTRY_CREDENTIALS = credentials('awodi2525')
-        DOCKER_REGISTRY_URL = '192.168.156.114:9090' // Docker Desktop's local registry URL
+
+    tools {
+        go 'go1.22.1'
     }
-    
+    environment {
+        GO122.1MODULE = 'on'
+        CGO_ENABLED = 0 
+        GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
+    }
+
     stages {
-        stage('Build Go Application') {
+        stage("unit-test") {
             steps {
-                // Checkout the source code from your Git repository
-                git 'https://github.com/Awodi-Emmanuel/http-echo.git'
-                
-                // Build the Go application
-                sh 'go build -o http-echo .'
+                echo 'UNIT TEST EXECUTION STARTED'
+                sh 'make unit-tests'
             }
         }
-        
-        stage('Build Docker Image') {
+        stage("functional-test") {
             steps {
-                script {
-                    // Use Dockerfile to build image
-                    docker.build("${DOCKER_REGISTRY_URL}/http-echo:latest", '-f Dockerfile .')
-                }
+                echo 'FUNCTIONAL TEST EXECUTION STARTED'
+                sh 'make functional-tests'
             }
         }
-        
-        stage('Push Docker Image to Local Registry') {
+        stage("build") {
             steps {
-                script {
-                    // Tag the Docker image for the local registry
-                    docker.image("${DOCKER_REGISTRY_URL}/http-echo:latest").withPush(true)
+                echo 'BUILD EXECUTION STARTED'
+                sh 'go version'
+                sh 'go get ./...'
+                sh 'docker build . -t awodi2525/img-http-echo'
+            }
+        }
+        stage('Docker Push') {
+            agent any
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerhubPassword', usernameVariable: 'dockerhubUser')]) {
+                sh "docker login -u ${env.dockerhubUser} -p ${env.dockerhubPassword}"
+                sh 'docker push awodi2525/img-http-echo'
                 }
             }
         }
