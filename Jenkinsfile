@@ -7,12 +7,12 @@ pipeline {
     }
 
     stages {
-        // stage('BUILD') {
-        //     steps {
-        //         sh 'go version'
-        //     }
-        // }
-        // ck 
+        stage('BUILD') {
+            steps {
+                sh 'go version'
+            }
+        }
+        
 
         stage('Build App Image') {
             steps {
