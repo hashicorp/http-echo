@@ -3,7 +3,7 @@ pipeline {
     
         // Ensure the desired Go version is installed for all stages,
     // using the name defined in the Global Tool Configuration
-    tools { go '1.22' }
+    tools { go 'go1.22' }
 
     environment {
         registry = "awodi2525/img-http-echo"
