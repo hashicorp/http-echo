@@ -12,6 +12,7 @@ pipeline {
         //         sh 'go version'
         //     }
         // }
+        // ck 
 
         stage('Build App Image') {
             steps {
