@@ -6,12 +6,12 @@ pipeline {
         registryCredential = 'dockerhub'
     }
 
-    // stages {
-    //     stage('BUILD') {
-    //         steps {
-    //             sh 'go version'
-    //         }
-        }
+    stages {
+        // stage('BUILD') {
+        //     steps {
+        //         sh 'go version'
+        //     }
+        // }
 
         stage('Build App Image') {
             steps {
