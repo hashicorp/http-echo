@@ -24,7 +24,7 @@ pipeline {
         }
     }
 
-    stage("Upload Image"){
+    stage('Upload Image'){
         steps{
             script {
                docker.withDockerRegistry('', registeryCredential) {
@@ -32,6 +32,18 @@ pipeline {
                 docker.Image.push("latest")
                }
             }
+        }
+    }
+
+    stage('Remove Unused docker image'){
+        steps{
+            sh "docker rmi $registry:V$BUILD_NUMBER"
+        }
+    }
+
+    stage('Kubernetes Deploy') {
+        steps {
+            sh "helm upgrade --install http-echo-release ./helm-http-echo --set image.repository=awodi2525/img-http-echo --set image.tag=latest"
         }
     }
 }
