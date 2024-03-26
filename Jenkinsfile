@@ -11,7 +11,7 @@ pipeline {
     //         steps {
     //             sh 'go version'
     //         }
-    //     }
+        }
 
         stage('Build App Image') {
             steps {
