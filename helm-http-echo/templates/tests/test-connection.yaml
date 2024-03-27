@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "helm-http-echo.fullname" . }}-test-connection"
+  labels:
+    {{- include "helm-http-echo.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "helm-http-echo.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

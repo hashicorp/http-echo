@@ -1,25 +1,19 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
+# Use a minimal Go base image
+FROM golang:alpine AS builder
 
-FROM gcr.io/distroless/static-debian12:nonroot as default
+WORKDIR /app
 
-# TARGETOS and TARGETARCH are set automatically when --platform is provided.
-ARG TARGETOS
-ARG TARGETARCH
-ARG PRODUCT_VERSION
-ARG BIN_NAME
+COPY . .
 
-LABEL name="http-echo" \
-      maintainer="HashiCorp Consul Team <consul@hashicorp.com>" \
-      vendor="HashiCorp" \
-      version=$PRODUCT_VERSION \
-      release=$PRODUCT_VERSION \
-      summary="A test webserver that echos a response. You know, for kids." 
+RUN go build -o http-echo .
 
-COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /
+FROM alpine
 
+WORKDIR /app
+
+COPY --from=builder /app/http-echo .
 EXPOSE 5678/tcp
 
-ENV ECHO_TEXT="hello-world"
+ENV ECHO_TEXT="hello-world" 
+ENTRYPOINT ["./http-echo"]
 
-ENTRYPOINT ["/http-echo"]
