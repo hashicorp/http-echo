@@ -2,11 +2,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: pod-reader-binding
-  namespace: ckad
+  namespace: jenkins-agent
 subjects:
 - kind: ServiceAccount
-  name: my-sa
-  namespace: ckad
+  name: jenkins-sa
+  namespace: jenkins-agent
 roleRef:
   kind: Role
   name: pod-reader

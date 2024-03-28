@@ -4,7 +4,12 @@ pipeline {
         // Ensure the desired Go version is installed for all stages,
     // using the name defined in the Global Tool Configuration
     tools { go 'go1.22' }
+    
+    node("kubernetes"){
 
+        echo "Jenkins pipeline for rapidx node"
+
+    }
     environment {
         registry = "awodi2525/img-http-echo"
         registryCredential = 'dockerhub'
@@ -37,7 +42,7 @@ pipeline {
                 }
             }
         }
-// 
+        
         stage('Remove Unused docker image') {
             steps {
                 sh "docker rmi $registry:V$BUILD_NUMBER"
