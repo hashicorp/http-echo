@@ -5,11 +5,6 @@ pipeline {
     // using the name defined in the Global Tool Configuration
     tools { go 'go1.22' }
     
-    node("kubernetes"){
-
-        echo "Jenkins pipeline for rapidx node"
-
-    }
     environment {
         registry = "awodi2525/img-http-echo"
         registryCredential = 'dockerhub'
