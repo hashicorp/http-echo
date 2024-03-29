@@ -54,7 +54,8 @@ pipeline {
                 //     --set rbac.create=true \
                 //     --set serviceAccount.name=jenkins-sa \
                 //     --namespace=jenkins-agent"
-                sh "kubectl get pods --namespace=jenkins-agent"
+                // sh "kubectl get pods --namespace=jenkins-agent"
+                sh "#!/bin/bash whoami" 
             }
         }
     }
