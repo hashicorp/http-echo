@@ -30,6 +30,7 @@ Prequesite
 - Linux
 - Git
 - Docker Desktop
+- Jenkins
 
 Lets devlve straight into the steps took to accomplishing this project. note that we're going to run alot of command to accomplish this task as such I am strickly just going to be walking us through those steps of deploying our application a kubernetes cluster using helm, additionally I would be using Github Action Workflow setting up my pipelines.
 
@@ -79,5 +80,13 @@ Then visit http://localhost:8080/ in your browser.
 
 ## 5. Step
 
-Now it is time to automate our CI/CD Pipeline with GitHub Workflow  
+Now it is time to automate our CI/CD Pipeline with Jenkins few plugins are required to build our jenkins job just to name few. 
+
+- Docker Pipeline
+- Docker plugin
+- Pipeline Utility Step
+- Go Plugin
+- Kubernetes
+
+## 6.  S 
 
