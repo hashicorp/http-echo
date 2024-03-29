@@ -47,13 +47,14 @@ pipeline {
         stage('Kubernetes Deploy') {
             steps {
                 // sh "helm upgrade --install http-echo-release ./helm-http-echo --set image.repository=awodi2525/img-http-echo --set image.tag=latest"
-                sh "helm upgrade --install http-echo-release ./helm-http-echo \
-                    --wait --timeout 600s -f ./helm-http-echo/values.yaml \
-                    --set image.repository=awodi2525/img-http-echo \
-                    --set image.tag=latest \
-                    --set rbac.create=true \
-                    --set serviceAccount.name=jenkins-sa \
-                    --namespace=jenkins-agent"
+                // sh "helm upgrade --install http-echo-release ./helm-http-echo \
+                //     --wait --timeout 600s -f ./helm-http-echo/values.yaml \
+                //     --set image.repository=awodi2525/img-http-echo \
+                //     --set image.tag=latest \
+                //     --set rbac.create=true \
+                //     --set serviceAccount.name=jenkins-sa \
+                //     --namespace=jenkins-agent"
+                sh "kubectl pods"
             }
         }
     }
