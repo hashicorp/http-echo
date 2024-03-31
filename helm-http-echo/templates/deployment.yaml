@@ -1,6 +1,6 @@
 # Deploy the hello-world-app to Kubernetes and expose it via a LoadBalancer
 ---
-apiVersion: apps/latest
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: http-echo #app name
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: http-echo
-          image: awodi2525/img-http-echo:v1
-          imagePullPolicy: Aways
+          image: awodi2525/img-http-echo:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
