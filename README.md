@@ -110,7 +110,7 @@ This project dockerised this Go web server and built a CI/CD pipeline with the f
 2. Build application Image and stage 
 3. Stage pushed the docker image to docker hub, 
 4. Stage remove unused docker image  
-5. This stage deploys our application to a kubernets cluster using a kubernetes package manager(Helm) if deployment is successful an IP alongside a port would be generated in my case  http://localhost:8080
+5. This stage deploys our application to a kubernets cluster using a kubernetes package manager(Helm) if deployment is successful an IP alongside a port would be generated in my case  http://127.0.0.1:8080
 
 We can rollback our deployment for more of helm and kubernetes command visit [here](https://helm.sh/docs/helm/) .
 This docs can be better your contributions are welcome.
