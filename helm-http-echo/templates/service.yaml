@@ -1,4 +1,19 @@
 
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: http-echo-service
+# spec:
+#   selector:
+#     app: http-echo
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 8080
+#   type: LoadBalancer
+
+
+
 kind: Service
 apiVersion: v1
 metadata:
@@ -8,6 +23,10 @@ spec:
     app: http-echo
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: LoadBalancer
+      port: <unset>  80/TCP
+      targetPort: <unset>  8081/TCP
+      Endpoints:                172.17.17.126:80
+      Session Affinity:         None
+      External Traffic Policy:  Cluster
+  type: NodePort
+  IP:   172.17.17.126
