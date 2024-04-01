@@ -23,10 +23,9 @@ spec:
     app: http-echo
   ports:
     - protocol: TCP
-      port: <unset>  80/TCP
-      targetPort: <unset>  8081/TCP
-      Endpoints:                172.17.17.126:80
-      Session Affinity:         None
-      External Traffic Policy:  Cluster
+      port: 80
+      targetPort: 8081
+      nodePort: 30000
   type: NodePort
-  IP:   172.17.17.126
+  sessionAffinity: None
+  externalTrafficPolicy: Cluster
