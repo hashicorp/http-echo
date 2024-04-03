@@ -1,4 +1,24 @@
 
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: http-echo-service
+# spec:
+#   selector:
+#     app: http-echo
+#   ports:
+#     - name: http
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 80
+#       nodePort: 8080
+#   type: NodePort
+#   # type: LoadBalancer
+#   # externalIPs: 
+#   #   - 172.17.17.126
+
+
+
 kind: Service
 apiVersion: v1
 metadata:
@@ -8,15 +28,8 @@ spec:
     app: http-echo
   ports:
     - name: http
-    - protocol: TCP
+      protocol: TCP
       port: 80
       targetPort: 80
       nodePort: 8080
   type: NodePort
-  # type: LoadBalancer
-  # externalIPs: 
-  #   - 172.17.17.126
-
-
-
-
