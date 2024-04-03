@@ -10,8 +10,7 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
-  type: 
-    - LoadBalancer
+  type: LoadBalancer
   externalIPs: 
     - 172.17.17.126
 
