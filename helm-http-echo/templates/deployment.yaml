@@ -19,6 +19,6 @@ spec:
           image: awodi2525/img-http-echo:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 5678
 
 
