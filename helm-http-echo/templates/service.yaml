@@ -30,6 +30,6 @@ spec:
     - name: http
       protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 5678
       # nodePort: 8080
   type: NodePort
