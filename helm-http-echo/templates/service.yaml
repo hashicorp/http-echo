@@ -7,12 +7,15 @@ spec:
   selector:
     app: http-echo
   ports:
+    - name: http
     - protocol: TCP
       port: 80
-      targetPort: 8080
-  type: LoadBalancer
-  externalIPs: 
-    - 172.17.17.126
+      targetPort: 80
+      nodePort: 8080
+  type: NodePort
+  # type: LoadBalancer
+  # externalIPs: 
+  #   - 172.17.17.126
 
 
 
