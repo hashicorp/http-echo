@@ -7,7 +7,7 @@ spec:
   selector:
     app: http-echo
   ports:
-    - name: http
+    # - name: http
     - protocol: TCP
       port: 8081
       targetPort: 5678
