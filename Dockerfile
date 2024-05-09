@@ -1,7 +1,8 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
+# Using lightweight base image
+FROM golang:1.20
 
-FROM gcr.io/distroless/static-debian12:nonroot as default
+# Set the working directory inside the container
+WORKDIR /app
 
 # TARGETOS and TARGETARCH are set automatically when --platform is provided.
 ARG TARGETOS
@@ -14,12 +15,20 @@ LABEL name="http-echo" \
       vendor="HashiCorp" \
       version=$PRODUCT_VERSION \
       release=$PRODUCT_VERSION \
-      summary="A test webserver that echos a response. You know, for kids." 
+      summary="A test webserver that echos a response. You know, for kids."
 
-COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /
+# Copy the source code into the container
+COPY . .
 
 EXPOSE 5678/tcp
 
 ENV ECHO_TEXT="hello-world"
 
-ENTRYPOINT ["/http-echo"]
+# Build the Go application
+RUN go build -o http-echo .
+
+# Expose the port the application listens on
+EXPOSE 8080
+
+# Command to run the executable
+CMD ["/app/http-echo"]
