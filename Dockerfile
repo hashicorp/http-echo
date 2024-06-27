@@ -1,7 +1,7 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
-FROM gcr.io/distroless/static-debian12:nonroot as default
+FROM alpine
 
 # TARGETOS and TARGETARCH are set automatically when --platform is provided.
 ARG TARGETOS
@@ -21,5 +21,7 @@ COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /
 EXPOSE 5678/tcp
 
 ENV ECHO_TEXT="hello-world"
+
+RUN apk --no-cache add curl
 
 ENTRYPOINT ["/http-echo"]
