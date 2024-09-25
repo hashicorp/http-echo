@@ -8,15 +8,18 @@ ARG TARGETOS
 ARG TARGETARCH
 ARG PRODUCT_VERSION
 ARG BIN_NAME
+ENV PRODUCT_NAME=$BIN_NAME
 
 LABEL name="http-echo" \
       maintainer="HashiCorp Consul Team <consul@hashicorp.com>" \
       vendor="HashiCorp" \
       version=$PRODUCT_VERSION \
       release=$PRODUCT_VERSION \
-      summary="A test webserver that echos a response. You know, for kids." 
+      licenses="MPL-2.0" \
+      summary="A test webserver that echos a response. You know, for kids."
 
 COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /
+COPY LICENSE /usr/share/doc/$PRODUCT_NAME/LICENSE.txt
 
 EXPOSE 5678/tcp
 

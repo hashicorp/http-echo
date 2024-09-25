@@ -87,6 +87,7 @@ jobs:
           arch: ${{ matrix.goarch }}
           reproducible: report
           instructions: |
+            cp LICENSE $TARGET_DIR/LICENSE.txt
             make build
 
   build-linux:
@@ -119,6 +120,7 @@ jobs:
           arch: ${{ matrix.goarch }}
           reproducible: report
           instructions: |
+            cp LICENSE $TARGET_DIR/LICENSE.txt
             make build
 
   build-darwin:
@@ -154,6 +156,7 @@ jobs:
           arch: ${{ matrix.goarch }}
           reproducible: report
           instructions: |
+            cp LICENSE $TARGET_DIR/LICENSE.txt
             make build
 
   build-docker-default:
