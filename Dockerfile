@@ -1,4 +1,4 @@
-# Copyright (c) HashiCorp, Inc.
+# Copyright IBM Corp. 2016, 2024
 # SPDX-License-Identifier: MPL-2.0
 
 FROM gcr.io/distroless/static-debian12:nonroot as default
