@@ -18,10 +18,11 @@ import (
 )
 
 var (
-	listenFlag  = flag.String("listen", ":5678", "address and port to listen")
-	textFlag    = flag.String("text", "", "text to put on the webpage")
-	versionFlag = flag.Bool("version", false, "display version information")
-	statusFlag  = flag.Int("status-code", 200, "http response code, e.g.: 200")
+	contentTypeFlag = flag.String("content-type", "text/plain; charset=utf-8", "the Content-Type header of response")
+	listenFlag      = flag.String("listen", ":5678", "address and port to listen")
+	textFlag        = flag.String("text", "", "text to put on the webpage")
+	versionFlag     = flag.Bool("version", false, "display version information")
+	statusFlag      = flag.Int("status-code", 200, "http response code, e.g.: 200")
 
 	// stdoutW and stderrW are for overriding in test.
 	stdoutW = os.Stdout
@@ -57,10 +58,10 @@ func main() {
 
 	// Flag gets printed as a page
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", httpLog(stdoutW, withAppHeaders(*statusFlag, httpEcho(echoText))))
+	mux.HandleFunc("/", httpLog(stdoutW, withAppHeaders(*statusFlag, httpEcho(echoText), *contentTypeFlag)))
 
 	// Health endpoint
-	mux.HandleFunc("/health", withAppHeaders(200, httpHealth()))
+	mux.HandleFunc("/health", withAppHeaders(200, httpHealth(), *contentTypeFlag))
 
 	server := &http.Server{
 		Addr:    *listenFlag,
