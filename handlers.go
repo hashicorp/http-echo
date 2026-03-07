@@ -13,18 +13,20 @@ import (
 )
 
 const (
-	httpHeaderAppName    string = "X-App-Name"
-	httpHeaderAppVersion string = "X-App-Version"
+	httpHeaderAppName     string = "X-App-Name"
+	httpHeaderAppVersion  string = "X-App-Version"
+	httpHeaderContentType string = "Content-Type"
 
 	httpLogDateFormat string = "2006/01/02 15:04:05"
 	httpLogFormat     string = "%v %s %s \"%s %s %s\" %d %d \"%s\" %v\n"
 )
 
-// withAppHeaders adds application headers such as X-App-Version and X-App-Name.
-func withAppHeaders(c int, h http.HandlerFunc) http.HandlerFunc {
+// withAppHeaders adds application headers such as X-App-Version, X-App-Name and Content-Type.
+func withAppHeaders(c int, h http.HandlerFunc, t string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(httpHeaderAppName, version.Name)
 		w.Header().Set(httpHeaderAppVersion, version.Version)
+		w.Header().Set(httpHeaderContentType, t)
 		w.WriteHeader(c)
 		h(w, r)
 	}
