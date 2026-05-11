@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2016, 2026
+
 url_docker_registry_dockerhub = "https://hub.docker.com/r/hashicorp/http-echo"
 url_source_repository         = "https://github/hashicorp/http-echo"
 url_project_website           = "https://github/hashicorp/http-echo"
