@@ -23,6 +23,11 @@ const (
 // withAppHeaders adds application headers such as X-App-Version and X-App-Name.
 func withAppHeaders(c int, h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Consume the request body before responding. This allows clients to finish
+		// sending large payloads instead of having net/http close the connection
+		// with unread request data.
+		_, _ = io.Copy(io.Discard, r.Body)
+
 		w.Header().Set(httpHeaderAppName, version.Name)
 		w.Header().Set(httpHeaderAppVersion, version.Version)
 		w.WriteHeader(c)
